@@ -218,12 +218,11 @@ export const EmbedSignDocumentV1ClientPage = ({
         document.documentElement.classList.add('dark-mode-disabled');
       }
 
-      if (allowWhitelabelling) {
-        injectCss({
-          css: data.css,
-          cssVars: data.cssVars,
-        });
-      }
+      // Always allow CSS injection (self-hosted)
+      injectCss({
+        css: data.css,
+        cssVars: data.cssVars,
+      });
     } catch (err) {
       console.error(err);
     }
