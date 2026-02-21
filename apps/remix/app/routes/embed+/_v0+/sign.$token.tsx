@@ -376,7 +376,7 @@ const EmbedSignDocumentPageV1 = ({
           metadata={document.documentMeta}
           isCompleted={isDocumentCompleted(document.status)}
           hidePoweredBy={hidePoweredBy}
-          allowWhitelabelling={allowEmbedSigningWhitelabel}
+          allowWhitelabelling={true}
           allRecipients={allRecipients}
         />
       </DocumentSigningAuthProvider>
@@ -406,10 +406,7 @@ const EmbedSignDocumentPageV2 = ({
         user={user}
       >
         <EnvelopeRenderProvider envelope={envelope} token={token}>
-          <EmbedSignDocumentV2ClientPage
-            hidePoweredBy={hidePoweredBy}
-            allowWhitelabelling={allowEmbedSigningWhitelabel}
-          />
+          <EmbedSignDocumentV2ClientPage hidePoweredBy={hidePoweredBy} allowWhitelabelling={true} />
         </EnvelopeRenderProvider>
       </DocumentSigningAuthProvider>
     </EnvelopeSigningProvider>
