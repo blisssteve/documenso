@@ -15,4 +15,6 @@ export const ZSignDocumentEmbedDataSchema = ZBaseEmbedDataSchema.extend({
   lockName: z.boolean().optional().default(false),
   allowDocumentRejection: z.boolean().optional(),
   showOtherRecipientsCompletedFields: z.boolean().optional(),
+  // Pre-populated signature (base64 data URL or typed text)
+  signature: z.string().optional(),
 });

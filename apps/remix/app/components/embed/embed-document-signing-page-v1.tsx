@@ -208,6 +208,11 @@ export const EmbedSignDocumentV1ClientPage = ({
         setFullName(data.name);
       }
 
+      // Pre-populate signature if provided (base64 data URL or typed text)
+      if (!isCompleted && data.signature) {
+        setSignature(data.signature);
+      }
+
       // Since a recipient can be provided a name we can lock it without requiring
       // a to be provided by the parent application, unlike direct templates.
       setIsNameLocked(!!data.lockName);
