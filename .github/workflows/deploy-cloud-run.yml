@@ -1,0 +1,113 @@
+name: Deploy Documenso to Cloud Run
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: bullreporter-yako
+  REGION: australia-southeast1
+  REPOSITORY: documenso
+  IMAGE_NAME: documenso
+  SERVICE_NAME: documenso
+  CLOUD_SQL_INSTANCE: bullreporter-yako:australia-southeast1:documenso-db
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -f docker/Dockerfile \
+            -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:latest \
+            .
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --region=${{ env.REGION }} \
+            --platform=managed \
+            --port=3000 \
+            --memory=1Gi \
+            --cpu=1 \
+            --min-instances=0 \
+            --max-instances=3 \
+            --timeout=300 \
+            --allow-unauthenticated \
+            --add-cloudsql-instances=${{ env.CLOUD_SQL_INSTANCE }} \
+            --set-env-vars="NODE_ENV=production" \
+            --set-env-vars="PORT=3000" \
+            --set-env-vars="NEXT_PRIVATE_JOBS_PROVIDER=local" \
+            --set-env-vars="NEXT_PRIVATE_SIGNING_TRANSPORT=local" \
+            --set-env-vars="NEXT_PRIVATE_SMTP_TRANSPORT=resend" \
+            --set-env-vars="NEXT_PRIVATE_SMTP_FROM_NAME=Emerald Vet" \
+            --set-env-vars="NEXT_PRIVATE_SMTP_FROM_ADDRESS=noreply@emeraldvet.com" \
+            --set-env-vars="NEXT_PUBLIC_UPLOAD_TRANSPORT=s3" \
+            --set-env-vars="NEXT_PRIVATE_UPLOAD_ENDPOINT=https://storage.googleapis.com" \
+            --set-env-vars="NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=true" \
+            --set-env-vars="NEXT_PRIVATE_UPLOAD_REGION=${{ env.REGION }}" \
+            --set-env-vars="NEXT_PRIVATE_UPLOAD_BUCKET=bullreporter-yako-documenso" \
+            --set-env-vars="DOCUMENSO_DISABLE_TELEMETRY=true" \
+            --set-secrets="NEXTAUTH_SECRET=DOCUMENSO_NEXTAUTH_SECRET:latest" \
+            --set-secrets="NEXT_PRIVATE_ENCRYPTION_KEY=DOCUMENSO_ENCRYPTION_KEY:latest" \
+            --set-secrets="NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=DOCUMENSO_ENCRYPTION_SECONDARY_KEY:latest" \
+            --set-secrets="NEXT_PRIVATE_DATABASE_URL=DOCUMENSO_DATABASE_URL:latest" \
+            --set-secrets="NEXT_PRIVATE_DIRECT_DATABASE_URL=DOCUMENSO_DIRECT_DATABASE_URL:latest" \
+            --set-secrets="NEXT_PRIVATE_RESEND_API_KEY=RESEND_API_KEY:latest" \
+            --set-secrets="NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=DOCUMENSO_UPLOAD_ACCESS_KEY_ID:latest" \
+            --set-secrets="NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=DOCUMENSO_UPLOAD_SECRET_ACCESS_KEY:latest" \
+            --set-secrets="NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS=DOCUMENSO_SIGNING_CERT:latest"
+
+      - name: Get service URL
+        run: |
+          URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --region=${{ env.REGION }} \
+            --format='value(status.url)')
+          echo "🚀 Documenso deployed to: $URL"
+          echo "SERVICE_URL=$URL" >> $GITHUB_ENV
+
+      - name: Update NEXT_PUBLIC_WEBAPP_URL
+        run: |
+          gcloud run services update ${{ env.SERVICE_NAME }} \
+            --region=${{ env.REGION }} \
+            --set-env-vars="NEXT_PUBLIC_WEBAPP_URL=${{ env.SERVICE_URL }}" \
+            --set-env-vars="NEXT_PRIVATE_INTERNAL_WEBAPP_URL=${{ env.SERVICE_URL }}"
+
+      - name: Health check
+        run: |
+          echo "Waiting for service to stabilize..."
+          sleep 30
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ env.SERVICE_URL }}/api/health" || echo "000")
+          if [ "$STATUS" = "200" ]; then
+            echo "✅ Health check passed!"
+          else
+            echo "⚠️ Health check returned status $STATUS (service may still be starting up)"
+          fi
