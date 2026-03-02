@@ -64,7 +64,6 @@ jobs:
             --allow-unauthenticated \
             --add-cloudsql-instances=${{ env.CLOUD_SQL_INSTANCE }} \
             --set-env-vars="NODE_ENV=production" \
-            --set-env-vars="PORT=3000" \
             --set-env-vars="NEXT_PRIVATE_JOBS_PROVIDER=local" \
             --set-env-vars="NEXT_PRIVATE_SIGNING_TRANSPORT=local" \
             --set-env-vars="NEXT_PRIVATE_SMTP_TRANSPORT=resend" \
