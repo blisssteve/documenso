@@ -72,22 +72,30 @@ npm run translate:compile
 npm run with:env -- npm run dev -w @documenso/remix
 ```
 
-### Production (Dokploy)
+### Production (Google Cloud Run)
 
-Build and deploy using the Dockerfile in `docker/Dockerfile`. Required environment variables:
+Deployed automatically via GitHub Actions CI/CD on push to `main`.
 
-```env
-NEXTAUTH_SECRET=<generate-with-openssl-rand-hex-32>
-NEXT_PUBLIC_WEBAPP_URL=https://documenso.yourdomain.com
-NEXT_PRIVATE_DATABASE_URL=postgresql://user:pass@host:5432/documenso
-NEXT_PRIVATE_DIRECT_DATABASE_URL=postgresql://user:pass@host:5432/documenso
-NEXT_PRIVATE_ENCRYPTION_KEY=<generate-with-openssl-rand-hex-32>
-NEXT_PRIVATE_SMTP_HOST=smtp.example.com
-NEXT_PRIVATE_SMTP_USER=your-smtp-user
-NEXT_PRIVATE_SMTP_PASSWORD=your-smtp-password
-NEXT_PRIVATE_SMTP_FROM_NAME="Your Organization"
-NEXT_PRIVATE_SMTP_FROM_ADDRESS=noreply@yourdomain.com
+**Infrastructure:**
+- **Cloud Run**: `australia-southeast1`, service name `documenso`
+- **Cloud SQL**: PostgreSQL 15 instance `documenso-db` (db-g1-small)
+- **Storage**: GCS bucket `bullreporter-yako-documenso` via S3-compatible interop (HMAC keys)
+- **Secrets**: All sensitive config stored in Google Secret Manager (prefix `DOCUMENSO_`)
+- **Email**: Resend API (`NEXT_PRIVATE_SMTP_TRANSPORT=resend`)
+- **Signing**: Self-signed `.p12` certificate for PDF document signing
+- **Registry**: Artifact Registry `documenso` in `australia-southeast1`
+
+**CI/CD Workflow:** `.github/workflows/deploy-cloud-run.yml`
+- Builds Docker image from `docker/Dockerfile`
+- Pushes to Artifact Registry
+- Deploys to Cloud Run with Cloud SQL sidecar and Secret Manager integration
+
+**Manual deploy:**
+```bash
+gh workflow run deploy-cloud-run.yml --repo=blisssteve/documenso
 ```
+
+**GitHub Secret required:** `GCP_SA_KEY` (service account key for `documenso-github-deploy@bullreporter-yako.iam.gserviceaccount.com`)
 
 ## Upstream
 

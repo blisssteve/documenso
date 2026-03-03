@@ -26,7 +26,7 @@ export const EmbedSignDocumentV2ClientPage = ({
 }: EmbedSignDocumentV2ClientPageProps) => {
   const { _ } = useLingui();
 
-  const { envelope, recipient, envelopeData, setFullName, setEmail, fullName } =
+  const { envelope, recipient, envelopeData, setFullName, setEmail, fullName, setSignature } =
     useRequiredEnvelopeSigningContext();
 
   const { isCompleted, isRejected, recipientSignature } = envelopeData;
@@ -129,6 +129,11 @@ export const EmbedSignDocumentV2ClientPage = ({
 
       if (!isCompleted && data.name) {
         setFullName(data.name);
+      }
+
+      // Pre-populate signature if provided (base64 data URL or typed text)
+      if (!isCompleted && data.signature) {
+        setSignature(data.signature);
       }
 
       // Since a recipient can be provided a name we can lock it without requiring

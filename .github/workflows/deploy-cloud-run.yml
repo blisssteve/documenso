@@ -62,19 +62,25 @@ jobs:
             --max-instances=3 \
             --timeout=300 \
             --allow-unauthenticated \
+            --command=node \
+            --args=build/server/main.js \
             --add-cloudsql-instances=${{ env.CLOUD_SQL_INSTANCE }} \
             --set-env-vars="NODE_ENV=production" \
             --set-env-vars="NEXT_PRIVATE_JOBS_PROVIDER=local" \
             --set-env-vars="NEXT_PRIVATE_SIGNING_TRANSPORT=local" \
             --set-env-vars="NEXT_PRIVATE_SMTP_TRANSPORT=resend" \
-            --set-env-vars="NEXT_PRIVATE_SMTP_FROM_NAME=Emerald Vet" \
-            --set-env-vars="NEXT_PRIVATE_SMTP_FROM_ADDRESS=noreply@emeraldvet.com" \
+            --set-env-vars="NEXT_PRIVATE_SMTP_FROM_NAME=BULLCHECK" \
+            --set-env-vars="NEXT_PRIVATE_SMTP_FROM_ADDRESS=certificates@bullcheck.com.au" \
             --set-env-vars="NEXT_PUBLIC_UPLOAD_TRANSPORT=s3" \
             --set-env-vars="NEXT_PRIVATE_UPLOAD_ENDPOINT=https://storage.googleapis.com" \
             --set-env-vars="NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=true" \
             --set-env-vars="NEXT_PRIVATE_UPLOAD_REGION=${{ env.REGION }}" \
             --set-env-vars="NEXT_PRIVATE_UPLOAD_BUCKET=bullreporter-yako-documenso" \
             --set-env-vars="DOCUMENSO_DISABLE_TELEMETRY=true" \
+            --set-env-vars="NEXTAUTH_URL=https://documenso-394843477204.australia-southeast1.run.app" \
+            --set-env-vars="NEXT_PUBLIC_WEBAPP_URL=https://documenso-394843477204.australia-southeast1.run.app" \
+            --set-env-vars="NEXT_PUBLIC_MARKETING_URL=https://documenso-394843477204.australia-southeast1.run.app" \
+            --set-env-vars="NEXT_PRIVATE_INTERNAL_WEBAPP_URL=https://documenso-394843477204.australia-southeast1.run.app" \
             --set-secrets="NEXTAUTH_SECRET=DOCUMENSO_NEXTAUTH_SECRET:latest" \
             --set-secrets="NEXT_PRIVATE_ENCRYPTION_KEY=DOCUMENSO_ENCRYPTION_KEY:latest" \
             --set-secrets="NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=DOCUMENSO_ENCRYPTION_SECONDARY_KEY:latest" \
@@ -92,13 +98,6 @@ jobs:
             --format='value(status.url)')
           echo "🚀 Documenso deployed to: $URL"
           echo "SERVICE_URL=$URL" >> $GITHUB_ENV
-
-      - name: Update NEXT_PUBLIC_WEBAPP_URL
-        run: |
-          gcloud run services update ${{ env.SERVICE_NAME }} \
-            --region=${{ env.REGION }} \
-            --set-env-vars="NEXT_PUBLIC_WEBAPP_URL=${{ env.SERVICE_URL }}" \
-            --set-env-vars="NEXT_PRIVATE_INTERNAL_WEBAPP_URL=${{ env.SERVICE_URL }}"
 
       - name: Health check
         run: |
