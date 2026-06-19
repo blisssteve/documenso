@@ -46,6 +46,7 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
   ]);
 
   const isSignatureField = isSignatureFieldType(field.type);
+  const isInitialsField = field.type === FieldType.INITIALS;
 
   /**
    * Red box is the original field width, height and position.
@@ -133,8 +134,8 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
   }
 
   const font = await pdf.embedFont(
-    isSignatureField ? fontCaveat : fontNoto,
-    isSignatureField ? { features: { calt: false } } : undefined,
+    isSignatureField || isInitialsField ? fontCaveat : fontNoto,
+    isSignatureField || isInitialsField ? { features: { calt: false } } : undefined,
   );
 
   if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {

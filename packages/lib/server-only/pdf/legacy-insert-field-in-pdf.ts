@@ -39,6 +39,7 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
   ]);
 
   const isSignatureField = isSignatureFieldType(field.type);
+  const isInitialsField = field.type === FieldType.INITIALS;
   const isDebugMode =
     // eslint-disable-next-line turbo/no-undeclared-env-vars
     process.env.DEBUG_PDF_INSERT === '1' || process.env.DEBUG_PDF_INSERT === 'true';
@@ -119,8 +120,8 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
   }
 
   const font = await pdf.embedFont(
-    isSignatureField ? fontCaveat : fontNoto,
-    isSignatureField ? { features: { calt: false } } : undefined,
+    isSignatureField || isInitialsField ? fontCaveat : fontNoto,
+    isSignatureField || isInitialsField ? { features: { calt: false } } : undefined,
   );
 
   if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {

@@ -1,3 +1,4 @@
+import { FieldType } from '@prisma/client';
 import Konva from 'konva';
 
 import { DEFAULT_STANDARD_FONT_SIZE } from '../../constants/pdf';
@@ -39,7 +40,9 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
   // Calculate text positioning based on alignment
   const textX = 0;
   const textY = 0;
-  const textFontSize = fieldMeta?.fontSize || DEFAULT_STANDARD_FONT_SIZE;
+  const isInsertedInitialsField = field.type === FieldType.INITIALS && field.inserted;
+  const textFontSize =
+    fieldMeta?.fontSize || (isInsertedInitialsField ? 22 : DEFAULT_STANDARD_FONT_SIZE);
 
   // By default, render the field name or label centered
   let textToRender: string = fieldMeta?.label || fieldTypeName;
@@ -107,7 +110,7 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
     align: textAlign,
     lineHeight: textLineHeight,
     letterSpacing: textLetterSpacing,
-    fontFamily: konvaTextFontFamily,
+    fontFamily: isInsertedInitialsField ? 'Caveat, sans-serif' : konvaTextFontFamily,
     fill: konvaTextFill,
     width: fieldWidth - DEFAULT_TEXT_X_PADDING * 2,
     height: fieldHeight,
