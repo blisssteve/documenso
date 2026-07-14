@@ -70,7 +70,6 @@ jobs:
             --set-env-vars="NEXT_PRIVATE_SIGNING_TRANSPORT=local" \
             --set-env-vars="NEXT_PRIVATE_SMTP_TRANSPORT=resend" \
             --set-env-vars="NEXT_PRIVATE_SMTP_FROM_NAME=BULLCHECK" \
-            --set-env-vars="NEXT_PRIVATE_SMTP_FROM_ADDRESS=certificates@bullcheck.com.au" \
             --set-env-vars="NEXT_PUBLIC_UPLOAD_TRANSPORT=s3" \
             --set-env-vars="NEXT_PRIVATE_UPLOAD_ENDPOINT=https://storage.googleapis.com" \
             --set-env-vars="NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=true" \
@@ -86,6 +85,7 @@ jobs:
             --set-secrets="NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=DOCUMENSO_ENCRYPTION_SECONDARY_KEY:latest" \
             --set-secrets="NEXT_PRIVATE_DATABASE_URL=DOCUMENSO_DATABASE_URL:latest" \
             --set-secrets="NEXT_PRIVATE_DIRECT_DATABASE_URL=DOCUMENSO_DIRECT_DATABASE_URL:latest" \
+            --set-secrets="NEXT_PRIVATE_SMTP_FROM_ADDRESS=EMAIL_FROM:latest" \
             --set-secrets="NEXT_PRIVATE_RESEND_API_KEY=RESEND_API_KEY:latest" \
             --set-secrets="NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=DOCUMENSO_UPLOAD_ACCESS_KEY_ID:latest" \
             --set-secrets="NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=DOCUMENSO_UPLOAD_SECRET_ACCESS_KEY:latest" \
