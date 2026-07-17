@@ -8,7 +8,7 @@ import {
   getV2AutoFillFields,
   getV2AutoFillValue,
   isV2AutoFillAllowed,
-  mapV2AutoFillWithConsent,
+  mapV2AutoFill,
   mapWithBoundedConcurrency,
   shouldPromptForV2AutoFill,
 } from './v2-embed-auto-fill';
@@ -139,9 +139,9 @@ describe('v2 embedded auto fill', () => {
     expect(attempted).toEqual([1, 2, 3, 2]);
   });
 
-  it('performs no field mutations when consent is cancelled', async () => {
+  it('performs no field mutations when the dialog does not submit any fields', async () => {
     const attempted: number[] = [];
-    const results = await mapV2AutoFillWithConsent(false, [1, 2, 3], async (id) => {
+    const results = await mapV2AutoFill([], async (id) => {
       attempted.push(id);
       await Promise.resolve();
       return id;

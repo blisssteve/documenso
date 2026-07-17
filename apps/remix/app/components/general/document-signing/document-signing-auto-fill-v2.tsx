@@ -3,7 +3,7 @@ import {
   getV2AutoFillFields,
   getV2AutoFillValue,
   isV2AutoFillAllowed,
-  mapV2AutoFillWithConsent,
+  mapV2AutoFill,
   shouldPromptForV2AutoFill,
 } from '@documenso/lib/client-only/v2-embed-auto-fill';
 import { AUTO_SIGNABLE_FIELD_TYPES } from '@documenso/lib/constants/autosign';
@@ -54,7 +54,7 @@ export const DocumentSigningAutoFillV2 = () => {
 
     try {
       const authOptions = getV2AutoFillAuthOptions(derivedRecipientActionAuth);
-      const results = await mapV2AutoFillWithConsent(true, targetFields, async (field) =>
+      const results = await mapV2AutoFill(targetFields, async (field) =>
         signField(field.id, getV2AutoFillValue(field.type, fullName, email), authOptions),
       );
       const failures = targetFields.filter((_field, index) => results[index].status === 'rejected');
@@ -71,15 +71,11 @@ export const DocumentSigningAutoFillV2 = () => {
   };
 
   const onCancel = () => {
-    // Use the same consent boundary as submission so this path is mechanically mutation-free.
-    void mapV2AutoFillWithConsent(false, targetFields, async (field) =>
-      signField(field.id, getV2AutoFillValue(field.type, fullName, email)),
-    );
     setOpen(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => nextOpen && setOpen(true)}>
+    <Dialog open={open} onOpenChange={(nextOpen) => !isSubmitting && setOpen(nextOpen)}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>

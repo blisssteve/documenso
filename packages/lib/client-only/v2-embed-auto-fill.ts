@@ -107,14 +107,7 @@ export const mapWithBoundedConcurrency = async <Input, Output>(
   return results;
 };
 
-export const mapV2AutoFillWithConsent = <Input, Output>(
-  hasConsent: boolean,
+export const mapV2AutoFill = <Input, Output>(
   items: Input[],
   worker: (item: Input, index: number) => Promise<Output>,
-): Promise<PromiseSettledResult<Output>[]> => {
-  if (!hasConsent) {
-    return Promise.resolve([]);
-  }
-
-  return mapWithBoundedConcurrency(items, AUTO_FILL_CONCURRENCY, worker);
-};
+): Promise<PromiseSettledResult<Output>[]> => mapWithBoundedConcurrency(items, AUTO_FILL_CONCURRENCY, worker);
