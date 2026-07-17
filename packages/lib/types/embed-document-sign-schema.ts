@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { parseEmbedSignature } from '../utils/embed-signature';
 import { zEmail } from '../utils/zod';
 import { ZBaseEmbedDataSchema } from './embed-base-schemas';
 
@@ -16,6 +17,6 @@ export const ZSignDocumentEmbedDataSchema = ZBaseEmbedDataSchema.extend({
   lockName: z.boolean().optional().default(false),
   allowDocumentRejection: z.boolean().optional(),
   showOtherRecipientsCompletedFields: z.boolean().optional(),
-  // Pre-populated signature (base64 data URL or typed text)
-  signature: z.string().optional(),
+  // A validated image candidate only. Applying it to a field still requires signer consent.
+  signature: z.unknown().optional().transform(parseEmbedSignature),
 });

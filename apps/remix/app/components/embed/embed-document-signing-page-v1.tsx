@@ -198,7 +198,7 @@ export const EmbedSignDocumentV1ClientPage = ({
         setFullName(data.name);
       }
 
-      // Pre-populate a v1 signature from the embed hash when provided.
+      // Keep the validated image ready; applying it to a field still requires a click.
       if (!isCompleted && data.signature) {
         setSignature(data.signature);
       }
@@ -232,8 +232,8 @@ export const EmbedSignDocumentV1ClientPage = ({
       } else {
         setHasFinishedInit(true);
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
+      console.error('Unable to initialize embedded signing data.');
       setHasFinishedInit(true);
     }
 

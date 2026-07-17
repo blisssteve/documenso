@@ -3,11 +3,12 @@ import { ZSignDocumentEmbedDataSchema } from '@documenso/lib/types/embed-documen
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { useLingui } from '@lingui/react';
-import { EnvelopeType } from '@prisma/client';
+import { EnvelopeType, RecipientRole } from '@prisma/client';
 import { useEffect, useLayoutEffect, useState } from 'react';
 
 import { injectCss } from '~/utils/css-vars';
 
+import { DocumentSigningAutoFillV2 } from '../general/document-signing/document-signing-auto-fill-v2';
 import { DocumentSigningPageViewV2 } from '../general/document-signing/document-signing-page-view-v2';
 import { useRequiredEnvelopeSigningContext } from '../general/document-signing/envelope-signing-provider';
 import { EmbedClientLoading } from './embed-client-loading';
@@ -26,7 +27,7 @@ export const EmbedSignDocumentV2ClientPage = ({
 }: EmbedSignDocumentV2ClientPageProps) => {
   const { _ } = useLingui();
 
-  const { envelope, recipient, envelopeData, setFullName, setEmail, fullName, email } =
+  const { envelope, recipient, envelopeData, setFullName, setEmail, fullName, email, initializeEmbedSignature } =
     useRequiredEnvelopeSigningContext();
 
   const { isCompleted, isRejected, recipientSignature } = envelopeData;
@@ -135,6 +136,10 @@ export const EmbedSignDocumentV2ClientPage = ({
         }
       }
 
+      if (!isCompleted && data.signature) {
+        initializeEmbedSignature(data.signature);
+      }
+
       // Since a recipient can be provided a name we can lock it without requiring
       // a to be provided by the parent application, unlike direct templates.
       setIsNameLocked(!!data.lockName);
@@ -168,8 +173,8 @@ export const EmbedSignDocumentV2ClientPage = ({
       } else {
         setHasFinishedInit(true);
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
+      console.error('Unable to initialize embedded signing data.');
       setHasFinishedInit(true);
     }
 
@@ -248,6 +253,8 @@ export const EmbedSignDocumentV2ClientPage = ({
     >
       <div className="embed--Root relative">
         {!hasFinishedInit && <EmbedClientLoading />}
+
+        {hasFinishedInit && recipient.role !== RecipientRole.ASSISTANT && <DocumentSigningAutoFillV2 />}
 
         <DocumentSigningPageViewV2 />
       </div>

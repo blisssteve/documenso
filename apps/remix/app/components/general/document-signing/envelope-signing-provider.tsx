@@ -5,12 +5,13 @@ import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/tr
 import type { EnvelopeForSigningResponse } from '@documenso/lib/server-only/envelope/get-envelope-for-recipient-signing';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { isFieldUnsignedAndRequired, isRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
+import { getEmbedSignatureForInitialization } from '@documenso/lib/utils/embed-signature';
 import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
 import { trpc } from '@documenso/trpc/react';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
 import { EnvelopeType, type Field, FieldType, type Recipient, RecipientRole, SigningStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { prop, sortBy } from 'remeda';
 
 export type EnvelopeSigningContextValue = {
@@ -22,6 +23,7 @@ export type EnvelopeSigningContextValue = {
   setEmail: (_value: string) => void;
   signature: string | null;
   setSignature: (_value: string | null) => void;
+  initializeEmbedSignature: (_value: unknown) => void;
 
   showPendingFieldTooltip: boolean;
   setShowPendingFieldTooltip: (_value: boolean) => void;
@@ -192,6 +194,21 @@ export const EnvelopeSigningProvider = ({
 
       return null;
     })(),
+  );
+
+  const initializeEmbedSignature = useCallback(
+    (candidate: unknown) => {
+      const validatedSignature = getEmbedSignatureForInitialization(
+        candidate,
+        envelope.documentMeta.uploadSignatureEnabled,
+        envelope.documentMeta.drawSignatureEnabled,
+      );
+
+      if (validatedSignature) {
+        setSignature(validatedSignature);
+      }
+    },
+    [envelope.documentMeta.uploadSignatureEnabled, envelope.documentMeta.drawSignatureEnabled],
   );
 
   /**
@@ -406,6 +423,7 @@ export const EnvelopeSigningProvider = ({
         setEmail,
         signature,
         setSignature,
+        initializeEmbedSignature,
         envelopeData,
         envelope,
 
