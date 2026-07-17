@@ -33,7 +33,7 @@ Hardcoded `allowWhitelabelling={true}` in both V1 and V2 embed signing route com
 ### 3. Pre-populated Signature Support (commit `1a54823`)
 
 **Files:**
-- `apps/remix/app/types/embed-document-sign-schema.ts`
+- `packages/lib/types/embed-document-sign-schema.ts`
 - `apps/remix/app/components/embed/embed-document-signing-page-v1.tsx`
 
 Added a `signature` field to the embed data schema, allowing a pre-populated signature to be passed in the embed URL hash. The signature can be either:
@@ -99,7 +99,7 @@ gh workflow run deploy-cloud-run.yml --repo=blisssteve/documenso
 
 ## Upstream
 
-Based on Documenso v2.6.1. To merge upstream changes:
+Based on Documenso v2.15.0. To merge upstream changes:
 
 ```bash
 git remote add upstream https://github.com/documenso/documenso.git
