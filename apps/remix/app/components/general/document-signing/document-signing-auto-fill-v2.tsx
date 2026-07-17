@@ -14,6 +14,7 @@ import { useLingui } from '@lingui/react';
 import { Plural, Trans } from '@lingui/react/macro';
 import type { FieldType } from '@prisma/client';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRequiredEmbedSigningContext } from '../../embed/embed-signing-context';
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { DocumentSigningDisclosure } from './document-signing-disclosure';
 import { useRequiredEnvelopeSigningContext } from './envelope-signing-provider';
@@ -22,6 +23,7 @@ export const DocumentSigningAutoFillV2 = () => {
   const { _ } = useLingui();
   const { derivedRecipientActionAuth } = useRequiredDocumentSigningAuthContext();
   const { email, fullName, recipient, recipientFields, signField } = useRequiredEnvelopeSigningContext();
+  const { onFieldSigned } = useRequiredEmbedSigningContext();
 
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -57,6 +59,16 @@ export const DocumentSigningAutoFillV2 = () => {
       const results = await mapV2AutoFill(targetFields, async (field) =>
         signField(field.id, getV2AutoFillValue(field.type, fullName, email), authOptions),
       );
+
+      results.forEach((result, index) => {
+        if (result.status === 'fulfilled' && result.value.inserted) {
+          const field = targetFields[index];
+          const value = getV2AutoFillValue(field.type, fullName, email).value;
+
+          onFieldSigned({ fieldId: field.id, value: JSON.stringify(value), isBase64: false });
+        }
+      });
+
       const failures = targetFields.filter((_field, index) => results[index].status === 'rejected');
 
       if (failures.length === 0) {

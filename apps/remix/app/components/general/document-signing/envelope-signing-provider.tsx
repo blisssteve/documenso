@@ -95,13 +95,19 @@ const prefillDateFields = (data: EnvelopeForSigningResponse): EnvelopeForSigning
       return field;
     }
 
+    const wasReadOnly =
+      typeof field.fieldMeta === 'object' &&
+      field.fieldMeta !== null &&
+      'readOnly' in field.fieldMeta &&
+      field.fieldMeta.readOnly === true;
+
     return {
       ...field,
       customText: formattedDate,
       inserted: true,
       fieldMeta: {
         ...(typeof field.fieldMeta === 'object' ? field.fieldMeta : {}),
-        prefilledDate: true,
+        prefilledDate: !wasReadOnly,
         readOnly: true,
       },
     };
@@ -375,6 +381,18 @@ export const EnvelopeSigningProvider = ({
       ...foundField,
       ...insertionValues,
     };
+
+    if (
+      fieldValue.type === FieldType.DATE &&
+      typeof updatedField.fieldMeta === 'object' &&
+      updatedField.fieldMeta !== null &&
+      'prefilledDate' in updatedField.fieldMeta &&
+      updatedField.fieldMeta.prefilledDate === true
+    ) {
+      const { prefilledDate: _prefilledDate, readOnly: _readOnly, ...fieldMeta } = updatedField.fieldMeta;
+
+      updatedField.fieldMeta = fieldMeta;
+    }
 
     if (fieldValue.type === FieldType.SIGNATURE) {
       const isBase64 = isBase64Image(fieldValue.value || '');

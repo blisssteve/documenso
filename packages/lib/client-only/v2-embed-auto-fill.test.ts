@@ -58,6 +58,7 @@ describe('v2 embedded auto fill', () => {
   it('includes locally prefilled dates while excluding fields already persisted as inserted', () => {
     const fields = [
       field(1, FieldType.DATE, true, { prefilledDate: true, readOnly: true }),
+      field(4, FieldType.DATE, true, { prefilledDate: false, readOnly: true }),
       field(2, FieldType.DATE, true),
       field(3, FieldType.INITIALS, true),
     ];
