@@ -62,8 +62,6 @@ jobs:
             --max-instances=20 \
             --timeout=300 \
             --allow-unauthenticated \
-            --command=node \
-            --args=build/server/main.js \
             --add-cloudsql-instances=${{ env.CLOUD_SQL_INSTANCE }} \
             --set-env-vars="NODE_ENV=production" \
             --set-env-vars="NEXT_PRIVATE_JOBS_PROVIDER=local" \
@@ -101,11 +99,22 @@ jobs:
 
       - name: Health check
         run: |
-          echo "Waiting for service to stabilize..."
-          sleep 30
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ env.SERVICE_URL }}/api/health" || echo "000")
-          if [ "$STATUS" = "200" ]; then
-            echo "✅ Health check passed!"
-          else
-            echo "⚠️ Health check returned status $STATUS (service may still be starting up)"
-          fi
+          echo "Waiting for service to become healthy..."
+          for attempt in $(seq 1 12); do
+            STATUS=$(curl --silent --show-error --output /dev/null --write-out "%{http_code}" \
+              --connect-timeout 5 --max-time 10 \
+              "${{ env.SERVICE_URL }}/api/health") || STATUS="000"
+
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Health check passed on attempt $attempt!"
+              exit 0
+            fi
+
+            echo "Health check attempt $attempt/12 returned status $STATUS"
+            if [ "$attempt" -lt 12 ]; then
+              sleep 10
+            fi
+          done
+
+          echo "❌ Service failed to return HTTP 200 after 12 health check attempts" >&2
+          exit 1
