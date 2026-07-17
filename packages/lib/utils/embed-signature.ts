@@ -35,12 +35,19 @@ export const parseEmbedSignature = (value: unknown): string | undefined => {
     return undefined;
   }
 
+  let decoded: string;
   let bytes: Uint8Array;
 
   try {
-    const decoded = atob(base64);
+    decoded = atob(base64);
     bytes = Uint8Array.from(decoded, (character) => character.charCodeAt(0));
   } catch {
+    return undefined;
+  }
+
+  const canonicalBase64 = btoa(decoded);
+
+  if (canonicalBase64 !== base64) {
     return undefined;
   }
 

@@ -16,11 +16,19 @@ type AutoFillField = {
   id: number;
   inserted: boolean;
   type: FieldType;
+  fieldMeta?: unknown;
 };
+
+const isLocallyPrefilledDate = (field: AutoFillField): boolean =>
+  field.type === FieldType.DATE &&
+  typeof field.fieldMeta === 'object' &&
+  field.fieldMeta !== null &&
+  'prefilledDate' in field.fieldMeta &&
+  field.fieldMeta.prefilledDate === true;
 
 export const getV2AutoFillFields = <T extends AutoFillField>(fields: T[], fullName: string, email: string): T[] =>
   fields.filter((field) => {
-    if (field.inserted || !AUTO_SIGNABLE_FIELD_TYPES.includes(field.type)) {
+    if ((field.inserted && !isLocallyPrefilledDate(field)) || !AUTO_SIGNABLE_FIELD_TYPES.includes(field.type)) {
       return false;
     }
 

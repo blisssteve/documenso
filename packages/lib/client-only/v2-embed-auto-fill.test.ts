@@ -13,7 +13,12 @@ import {
   shouldPromptForV2AutoFill,
 } from './v2-embed-auto-fill';
 
-const field = (id: number, type: FieldType, inserted = false) => ({ id, type, inserted });
+const field = (id: number, type: FieldType, inserted = false, fieldMeta?: unknown) => ({
+  id,
+  type,
+  inserted,
+  fieldMeta,
+});
 
 describe('v2 embedded auto fill', () => {
   it('uses the existing greater-than-five threshold', () => {
@@ -48,6 +53,16 @@ describe('v2 embedded auto fill', () => {
     ];
 
     expect(getV2AutoFillFields(fields, 'Ada Lovelace', 'ada@example.com').map(({ id }) => id)).toEqual([1, 2, 3, 4]);
+  });
+
+  it('includes locally prefilled dates while excluding fields already persisted as inserted', () => {
+    const fields = [
+      field(1, FieldType.DATE, true, { prefilledDate: true, readOnly: true }),
+      field(2, FieldType.DATE, true),
+      field(3, FieldType.INITIALS, true),
+    ];
+
+    expect(getV2AutoFillFields(fields, 'Ada Lovelace', '').map(({ id }) => id)).toEqual([1]);
   });
 
   it('excludes name and initials without a full name, and email without an email address', () => {

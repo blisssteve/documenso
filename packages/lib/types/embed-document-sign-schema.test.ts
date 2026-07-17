@@ -29,6 +29,8 @@ describe('parseEmbedSignature', () => {
     ['GIF', 'data:image/gif;base64,R0lGODlh'],
     ['WebP', 'data:image/webp;base64,UklGRg=='],
     ['malformed base64', 'data:image/png;base64,%%%'],
+    ['noncanonical one-byte padding bits', 'data:image/png;base64,iVBORw0KGgoAAB=='],
+    ['noncanonical two-byte padding bits', 'data:image/png;base64,iVBORw0KGgoAAAB='],
     ['PNG MIME with JPEG bytes', dataUrl('image/png', JPEG_PREFIX)],
     ['JPEG MIME with PNG bytes', dataUrl('image/jpeg', PNG_PREFIX)],
   ])('drops %s without rejecting the remaining embed data', (_label, signature) => {

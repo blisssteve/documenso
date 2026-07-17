@@ -101,6 +101,7 @@ const prefillDateFields = (data: EnvelopeForSigningResponse): EnvelopeForSigning
       inserted: true,
       fieldMeta: {
         ...(typeof field.fieldMeta === 'object' ? field.fieldMeta : {}),
+        prefilledDate: true,
         readOnly: true,
       },
     };

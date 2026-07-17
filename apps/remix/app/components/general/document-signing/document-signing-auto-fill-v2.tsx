@@ -76,7 +76,7 @@ export const DocumentSigningAutoFillV2 = () => {
 
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !isSubmitting && setOpen(nextOpen)}>
-      <DialogContent>
+      <DialogContent hideClose>
         <DialogHeader>
           <DialogTitle>
             <Trans>Automatically sign fields</Trans>
