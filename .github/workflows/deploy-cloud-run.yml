@@ -62,6 +62,8 @@ jobs:
             --max-instances=20 \
             --timeout=300 \
             --allow-unauthenticated \
+            --command="" \
+            --args="" \
             --add-cloudsql-instances=${{ env.CLOUD_SQL_INSTANCE }} \
             --set-env-vars="NODE_ENV=production" \
             --set-env-vars="NEXT_PRIVATE_JOBS_PROVIDER=local" \
