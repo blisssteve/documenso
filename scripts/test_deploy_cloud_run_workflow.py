@@ -29,10 +29,15 @@ class DeployCloudRunWorkflowTest(unittest.TestCase):
 
     def test_deploy_preserves_image_default_command(self) -> None:
         deploy = named_step_script(self.workflow, "Deploy to Cloud Run")
-        self.assertNotRegex(
+        self.assertRegex(
             deploy,
-            r"--(?:command|args)(?:=|\s)",
-            "Cloud Run must use the image CMD (sh start.sh), which runs Prisma migrations",
+            r'--command=""',
+            "Cloud Run must clear any persisted command override",
+        )
+        self.assertRegex(
+            deploy,
+            r'--args=""',
+            "Cloud Run must clear any persisted argument override",
         )
 
     def test_health_check_retries_and_fails_closed(self) -> None:
