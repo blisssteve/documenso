@@ -8,6 +8,7 @@ import unittest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = REPO_ROOT / ".github" / "workflows" / "deploy-cloud-run.yml"
+START_SCRIPT = REPO_ROOT / "docker" / "start.sh"
 
 
 def named_step_script(workflow: str, step_name: str) -> str:
@@ -43,6 +44,14 @@ class DeployCloudRunWorkflowTest(unittest.TestCase):
             health,
             r"\|\|\s*echo\s+[\"']?000",
             "curl errors must not append a second status code",
+        )
+
+    def test_start_script_fails_closed_when_migrations_fail(self) -> None:
+        start_script = START_SCRIPT.read_text(encoding="utf-8")
+        self.assertRegex(
+            start_script,
+            r"^#!/bin/sh\nset -eu\n",
+            "Migration failure must stop the container before the server starts",
         )
 
 
