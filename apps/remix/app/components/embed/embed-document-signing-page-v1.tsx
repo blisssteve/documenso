@@ -34,6 +34,7 @@ import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 import { injectCss } from '~/utils/css-vars';
 
 import { DocumentSigningAttachmentsPopover } from '../general/document-signing/document-signing-attachments-popover';
+import { DocumentSigningAutoSign } from '../general/document-signing/document-signing-auto-sign';
 import { useRequiredDocumentSigningContext } from '../general/document-signing/document-signing-provider';
 import { DocumentSigningRecipientProvider } from '../general/document-signing/document-signing-recipient-provider';
 import { DocumentSigningRejectDialog } from '../general/document-signing/document-signing-reject-dialog';
@@ -467,6 +468,8 @@ export const EmbedSignDocumentV1ClientPage = ({
                           />
                         </div>
                       )}
+
+                      <DocumentSigningAutoSign recipient={recipient} fields={fields} />
                     </>
                   )}
                 </div>
