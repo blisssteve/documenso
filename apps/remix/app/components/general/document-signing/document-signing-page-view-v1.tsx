@@ -381,6 +381,10 @@ export const DocumentSigningPageViewV1 = ({
                   fieldsValidated={fieldsValidated}
                   nextRecipient={nextRecipient}
                 />
+
+                {recipient.role !== RecipientRole.ASSISTANT && (
+                  <DocumentSigningAutoSign recipient={recipient} fields={fields} />
+                )}
               </div>
             </div>
           </div>
@@ -391,10 +395,6 @@ export const DocumentSigningPageViewV1 = ({
           fields={completedFields}
           showRecipientTooltip={true}
         />
-
-        {recipient.role !== RecipientRole.ASSISTANT && (
-          <DocumentSigningAutoSign recipient={recipient} fields={fields} />
-        )}
 
         <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
           {fields
