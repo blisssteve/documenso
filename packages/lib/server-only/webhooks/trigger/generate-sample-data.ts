@@ -13,13 +13,11 @@ import {
 
 import type { WebhookPayload } from '../../../types/webhook-payload';
 
-export const generateSampleWebhookPayload = (
-  event: WebhookTriggerEvents,
-  webhookUrl: string,
-): WebhookPayload => {
+export const generateSampleWebhookPayload = (event: WebhookTriggerEvents, webhookUrl: string): WebhookPayload => {
   const now = new Date();
   const basePayload = {
     id: 10,
+    envelopeId: 'env_123',
     externalId: null,
     userId: 1,
     authOptions: null,
@@ -55,6 +53,7 @@ export const generateSampleWebhookPayload = (
     recipients: [
       {
         id: 52,
+        envelopeId: 'env_123',
         documentId: 10,
         templateId: null,
         email: 'signer@documenso.com',
@@ -76,6 +75,7 @@ export const generateSampleWebhookPayload = (
     Recipient: [
       {
         id: 52,
+        envelopeId: 'env_123',
         documentId: 10,
         templateId: null,
         email: 'signer@documenso.com',
@@ -272,6 +272,7 @@ export const generateSampleWebhookPayload = (
         recipients: [
           {
             id: 50,
+            envelopeId: 'env_123',
             documentId: 10,
             templateId: null,
             email: 'signer2@documenso.com',
@@ -294,6 +295,7 @@ export const generateSampleWebhookPayload = (
           },
           {
             id: 51,
+            envelopeId: 'env_123',
             documentId: 10,
             templateId: null,
             email: 'signer1@documenso.com',
@@ -318,6 +320,7 @@ export const generateSampleWebhookPayload = (
         Recipient: [
           {
             id: 50,
+            envelopeId: 'env_123',
             documentId: 10,
             templateId: null,
             email: 'signer2@documenso.com',
@@ -340,6 +343,7 @@ export const generateSampleWebhookPayload = (
           },
           {
             id: 51,
+            envelopeId: 'env_123',
             documentId: 10,
             templateId: null,
             email: 'signer1@documenso.com',
@@ -440,12 +444,14 @@ export const generateSampleWebhookPayload = (
             documentCompleted: true,
             ownerDocumentCompleted: true,
             ownerRecipientExpired: true,
+            ownerDocumentCreated: true,
             recipientSigningRequest: true,
           },
         },
         recipients: [
           {
             id: 7,
+            envelopeId: 'env_123',
             documentId: 7,
             templateId: null,
             email: 'signer1@documenso.com',
@@ -470,6 +476,7 @@ export const generateSampleWebhookPayload = (
         Recipient: [
           {
             id: 7,
+            envelopeId: 'env_123',
             documentId: 7,
             templateId: null,
             email: 'signer@documenso.com',
@@ -539,6 +546,120 @@ export const generateSampleWebhookPayload = (
             signingStatus: SigningStatus.NOT_SIGNED,
           },
         ],
+      },
+      createdAt: now.toISOString(),
+      webhookEndpoint: webhookUrl,
+    };
+  }
+
+  if (event === WebhookTriggerEvents.DOCUMENT_RECIPIENT_COMPLETED) {
+    return {
+      event,
+      payload: {
+        ...basePayload,
+        status: DocumentStatus.PENDING,
+        recipients: [
+          {
+            ...basePayload.recipients[0],
+            readStatus: ReadStatus.OPENED,
+            signingStatus: SigningStatus.SIGNED,
+            signedAt: now,
+          },
+        ],
+        Recipient: [
+          {
+            ...basePayload.recipients[0],
+            readStatus: ReadStatus.OPENED,
+            signingStatus: SigningStatus.SIGNED,
+            signedAt: now,
+          },
+        ],
+      },
+      createdAt: now.toISOString(),
+      webhookEndpoint: webhookUrl,
+    };
+  }
+
+  if (event === WebhookTriggerEvents.DOCUMENT_REMINDER_SENT) {
+    return {
+      event,
+      payload: {
+        ...basePayload,
+        status: DocumentStatus.PENDING,
+        recipients: [
+          {
+            ...basePayload.recipients[0],
+            sendStatus: SendStatus.SENT,
+            signingStatus: SigningStatus.NOT_SIGNED,
+          },
+        ],
+        Recipient: [
+          {
+            ...basePayload.recipients[0],
+            sendStatus: SendStatus.SENT,
+            signingStatus: SigningStatus.NOT_SIGNED,
+          },
+        ],
+      },
+      createdAt: now.toISOString(),
+      webhookEndpoint: webhookUrl,
+    };
+  }
+
+  if (event === WebhookTriggerEvents.TEMPLATE_CREATED) {
+    return {
+      event,
+      payload: {
+        ...basePayload,
+        title: 'My Template',
+        status: DocumentStatus.DRAFT,
+        templateId: 10,
+        source: DocumentSource.TEMPLATE,
+      },
+      createdAt: now.toISOString(),
+      webhookEndpoint: webhookUrl,
+    };
+  }
+
+  if (event === WebhookTriggerEvents.TEMPLATE_UPDATED) {
+    return {
+      event,
+      payload: {
+        ...basePayload,
+        title: 'My Updated Template',
+        status: DocumentStatus.DRAFT,
+        templateId: 10,
+        source: DocumentSource.TEMPLATE,
+      },
+      createdAt: now.toISOString(),
+      webhookEndpoint: webhookUrl,
+    };
+  }
+
+  if (event === WebhookTriggerEvents.TEMPLATE_DELETED) {
+    return {
+      event,
+      payload: {
+        ...basePayload,
+        title: 'Deleted Template',
+        status: DocumentStatus.DRAFT,
+        templateId: 10,
+        source: DocumentSource.TEMPLATE,
+      },
+      createdAt: now.toISOString(),
+      webhookEndpoint: webhookUrl,
+    };
+  }
+
+  if (event === WebhookTriggerEvents.TEMPLATE_USED) {
+    return {
+      event,
+      payload: {
+        ...basePayload,
+        title: 'Document from Template',
+        status: DocumentStatus.DRAFT,
+        templateId: 10,
+        source: DocumentSource.TEMPLATE,
       },
       createdAt: now.toISOString(),
       webhookEndpoint: webhookUrl,

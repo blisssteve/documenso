@@ -1,4 +1,5 @@
 #!/bin/sh
+set -eu
 
 # 🚀 Starting Documenso...
 printf "🚀 Starting Documenso...\n\n"
