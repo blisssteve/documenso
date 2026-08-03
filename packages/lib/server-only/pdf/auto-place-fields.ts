@@ -16,6 +16,49 @@ export type BoundingBox = {
 };
 
 /**
+ * A single indexed placeholder occurrence: its page index and exact bounding box.
+ */
+export type PlaceholderIndexEntry = {
+  pageIndex: number;
+  bbox: BoundingBox;
+};
+
+/**
+ * Lookup of placeholder text -> all occurrences, in page order with exact bbox.
+ */
+export type PlaceholderIndex = Map<string, PlaceholderIndexEntry[]>;
+
+/**
+ * Scan every page of a loaded PDF exactly once using the {{...}} regex and index
+ * every match by its exact placeholder text.
+ *
+ * Returns a map keyed by the full matched placeholder text (e.g. "{{NAME}}"),
+ * whose values are the occurrences in page order, each preserving the page index
+ * and exact bounding box. This is a one-pass replacement for calling
+ * pdfDoc.findText() once per requested placeholder.
+ */
+export const buildPlaceholderIndex = (pdfDoc: PDF): PlaceholderIndex => {
+  const index: PlaceholderIndex = new Map();
+
+  for (const page of pdfDoc.getPages()) {
+    const matches = page.findText(PLACEHOLDER_REGEX);
+
+    for (const match of matches) {
+      const entries = index.get(match.text) ?? [];
+
+      entries.push({
+        pageIndex: page.index,
+        bbox: match.bbox,
+      });
+
+      index.set(match.text, entries);
+    }
+  }
+
+  return index;
+};
+
+/**
  * Draw white rectangles over specified regions in a loaded PDF document.
  *
  * Mutates the PDF in place. Coordinates use bottom-left origin (standard PDF coordinates).

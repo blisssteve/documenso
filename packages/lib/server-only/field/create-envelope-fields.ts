@@ -14,7 +14,12 @@ import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
 import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
-import { type BoundingBox, whiteoutRegions } from '../pdf/auto-place-fields';
+import {
+  type BoundingBox,
+  buildPlaceholderIndex,
+  type PlaceholderIndex,
+  whiteoutRegions,
+} from '../pdf/auto-place-fields';
 
 type CoordinatePosition = {
   page: number;
@@ -119,6 +124,12 @@ export const createEnvelopeFields = async ({
     over resolved placeholders before saving back.
   */
   const pdfCache = new Map<string, PDF>();
+  /*
+    One-pass placeholder index per loaded envelope item, keyed by exact
+    placeholder text. Built once per PDF so each requested placeholder is an
+    O(1) map lookup instead of another full-document pdfDoc.findText() scan.
+  */
+  const placeholderIndexCache = new Map<string, PlaceholderIndex>();
 
   if (hasPlaceholderFields) {
     for (const item of envelope.envelopeItems) {
@@ -126,6 +137,7 @@ export const createEnvelopeFields = async ({
       const pdfDoc = await PDF.load(new Uint8Array(bytes));
 
       pdfCache.set(item.id, pdfDoc);
+      placeholderIndexCache.set(item.id, buildPlaceholderIndex(pdfDoc));
     }
   }
 
@@ -179,7 +191,7 @@ export const createEnvelopeFields = async ({
         });
       }
 
-      const matches = pdfDoc.findText(field.placeholder);
+      const matches = placeholderIndexCache.get(envelopeItemId)?.get(field.placeholder) ?? [];
 
       if (matches.length === 0) {
         throw new AppError(AppErrorCode.INVALID_BODY, {
