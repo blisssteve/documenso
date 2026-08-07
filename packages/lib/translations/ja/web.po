@@ -179,6 +179,11 @@ msgstr "{0, plural, other {# 個のテンプレート}}"
 msgid "{0, plural, one {<0>You have <1>1</1> pending invitation</0>} other {<2>You have <3>#</3> pending invitations</2>}}"
 msgstr "{0, plural, other {<2>保留中の招待が <3>#</3> 件あります</2>}}"
 
+#. placeholder {0}: targetFields.length
+#: apps/remix/app/components/general/document-signing/document-signing-auto-fill-v2.tsx
+msgid "{0, plural, one {1 field could not be filled. The successful fields were kept; retry the remaining field or fill it manually.} other {# fields could not be filled. The successful fields were kept; retry the remaining fields or fill them manually.}}"
+msgstr ""
+
 #. placeholder {0}: recipientFieldsRemaining.length
 #: apps/remix/app/components/general/document-signing/document-signing-mobile-widget.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
@@ -198,8 +203,8 @@ msgstr "{0, plural, other {新しいPDFのページ数が現在のものより�
 msgid "{0, plural, one {1 Field} other {# Fields}}"
 msgstr "{0, plural, other {# 個のフィールド}}"
 
-#. placeholder {0}: autoSignableFields.filter((f) => f.type === fieldType).length
-#: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
+#. placeholder {0}: targetFields.filter((field) => field.type === fieldType).length
+#: apps/remix/app/components/general/document-signing/document-signing-auto-fill-v2.tsx
 msgid "{0, plural, one {1 matching field} other {# matching fields}}"
 msgstr "{0, plural, other {# 個の一致するフィールド}}"
 
@@ -278,7 +283,7 @@ msgstr "{0, plural, other {選択したテンプレートを削除しようと�
 
 #. placeholder {0}: _(FRIENDLY_FIELD_TYPE[fieldType as FieldType])
 #. placeholder {0}: route.label
-#: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-auto-fill-v2.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 msgid "{0}"
@@ -1416,8 +1421,8 @@ msgid "Add Placeholders"
 msgstr "プレースホルダーを追加"
 
 #: apps/remix/app/components/general/rate-limit-array-input.tsx
-msgid "Add rate limit"
-msgstr "レート制限を追加"
+msgid "Add rate limit window"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "Add recipients"
@@ -1762,10 +1767,6 @@ msgstr "テンプレートプレースホルダーの自動保存中にエラー
 msgid "An error occurred while auto-saving the template settings."
 msgstr "テンプレート設定の自動保存中にエラーが発生しました。"
 
-#: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
-msgid "An error occurred while auto-signing the document, some fields may not be signed. Please review and manually sign any remaining fields."
-msgstr "ドキュメントの自動署名中にエラーが発生しました。一部のフィールドに署名されていない可能性があります。残りのフィールドを確認し、手動で署名してください。"
-
 #: apps/remix/app/components/dialogs/envelopes-bulk-cancel-dialog.tsx
 msgid "An error occurred while cancelling the documents."
 msgstr "文書のキャンセル中にエラーが発生しました。"
@@ -1809,6 +1810,10 @@ msgstr "ダイレクトリンク署名を有効にする際にエラーが発生
 #: apps/remix/app/components/dialogs/admin-user-enable-dialog.tsx
 msgid "An error occurred while enabling the user."
 msgstr "ユーザーの有効化中にエラーが発生しました。"
+
+#: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
+msgid "An error occurred while filling the document, some fields may not be signed. Please review and manually sign any remaining fields."
+msgstr ""
 
 #: apps/remix/app/components/general/pdf-viewer/pdf-viewer.tsx
 msgid "An error occurred while loading the document."
@@ -2008,6 +2013,7 @@ msgstr "すべてのソース"
 msgid "Any Status"
 msgstr "すべてのステータス"
 
+#: apps/remix/app/components/general/claim-limit-fields.tsx
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 msgid "API"
 msgstr "API"
@@ -2016,10 +2022,6 @@ msgstr "API"
 #: apps/remix/app/components/forms/email-transport-form.tsx
 msgid "API key"
 msgstr "API キー"
-
-#: apps/remix/app/components/general/claim-limit-fields.tsx
-msgid "API rate limits"
-msgstr "API レート制限"
 
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 msgid "API requests"
@@ -2285,7 +2287,7 @@ msgstr "認証が必要です"
 msgid "Authenticator app"
 msgstr "認証アプリ"
 
-#: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-auto-fill-v2.tsx
 msgid "Automatically sign fields"
 msgstr "フィールドに自動で署名する"
 
@@ -2621,7 +2623,7 @@ msgstr "メンバーが見つかりませんか？"
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-password.tsx
-#: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-auto-fill-v2.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-form.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-form.tsx
@@ -2680,6 +2682,10 @@ msgstr "署名者を削除できません"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 msgid "Cannot upload items after the document has been sent"
 msgstr "ドキュメント送信後はアイテムをアップロードできません"
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Capabilities enabled for this organisation."
+msgstr ""
 
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role name"
@@ -4407,10 +4413,6 @@ msgstr "ドキュメント設定"
 msgid "Document preferences updated"
 msgstr "文書設定を更新しました"
 
-#: apps/remix/app/components/general/claim-limit-fields.tsx
-msgid "Document rate limits"
-msgstr "ドキュメントのレート制限"
-
 #: apps/remix/app/components/general/document-signing/document-signing-reject-dialog.tsx
 #: apps/remix/app/components/general/document/document-status.tsx
 msgid "Document rejected"
@@ -4546,6 +4548,7 @@ msgstr "ドキュメント"
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-nav-desktop.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/components/general/claim-limit-fields.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-upload-page.tsx
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 #: apps/remix/app/components/general/skeletons/document-edit-skeleton.tsx
@@ -4995,10 +4998,6 @@ msgstr "メール設定"
 msgid "Email preferences updated"
 msgstr "メール設定を更新しました"
 
-#: apps/remix/app/components/general/claim-limit-fields.tsx
-msgid "Email rate limits"
-msgstr "メールのレート制限"
-
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Email recipients when a pending document is deleted"
 msgstr "保留中のドキュメントが削除されたときに受信者へメール通知する"
@@ -5094,6 +5093,7 @@ msgstr "メール認証を削除しました"
 msgid "Email verification has been resent"
 msgstr "メール認証を再送しました"
 
+#: apps/remix/app/components/general/claim-limit-fields.tsx
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 #: apps/remix/app/components/tables/admin-organisation-stats-table.tsx
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
@@ -5107,15 +5107,13 @@ msgstr "メール"
 msgid "Embedding, 5 members included and more"
 msgstr "埋め込み、5 メンバー含む など"
 
-#: apps/remix/app/components/general/claim-limit-fields.tsx
-#: apps/remix/app/components/general/claim-limit-fields.tsx
-#: apps/remix/app/components/general/claim-limit-fields.tsx
-msgid "Empty = Unlimited, 0 = Blocked"
-msgstr "空欄 = 無制限、0 = ブロックされます"
-
 #: packages/ui/primitives/document-flow/add-fields.tsx
 msgid "Empty field"
 msgstr "空のフィールド"
+
+#: apps/remix/app/components/general/claim-limit-fields.tsx
+msgid "Empty quota means unlimited, 0 blocks the resource. Rate limit windows accept values like 5m, 1h or 24h."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/team-inherit-member-enable-dialog.tsx
 msgid "Enable"
@@ -5236,6 +5234,10 @@ msgstr "埋め込みトークンを使用していることを確認し、API �
 msgid "Enter"
 msgstr "入力してください"
 
+#: apps/remix/app/components/general/rate-limit-array-input.tsx
+msgid "Enter a max request count greater than 0"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Enter a name for your new folder. Folders help you organise your items."
 msgstr "新しいフォルダ名を入力してください。フォルダを使うとアイテムを整理できます。"
@@ -5243,6 +5245,10 @@ msgstr "新しいフォルダ名を入力してください。フォルダを使
 #: apps/remix/app/components/dialogs/envelope-rename-dialog.tsx
 msgid "Enter a new title"
 msgstr "新しいタイトルを入力してください"
+
+#: apps/remix/app/components/general/rate-limit-array-input.tsx
+msgid "Enter a window, e.g. 5m"
+msgstr ""
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Enter claim name"
@@ -5501,6 +5507,10 @@ msgstr "全員が署名しました"
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Everyone has signed! You will receive an email copy of the signed document."
 msgstr "全員が署名しました。署名済みドキュメントのコピーがメールで送信されます。"
+
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
+msgid "Exceeded"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "Exceeded timeout"
@@ -5792,6 +5802,11 @@ msgstr "新しいメールトランスポートを作成するために詳細を
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Fill in the details to create a new subscription claim."
 msgstr "新しいサブスクリプションクレームを作成するための詳細を入力してください。"
+
+#. placeholder {0}: targetFields.length
+#: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
+msgid "Fill Name and Initials ({0})"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains._index.tsx
 msgid "Filter by status"
@@ -6765,6 +6780,10 @@ msgstr "ライトモード"
 msgid "Like to have your own public profile with agreements?"
 msgstr "自分の合意書付き公開プロフィールが欲しいですか？"
 
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
+msgid "Limit reached"
+msgstr ""
+
 #: apps/remix/app/components/general/claim-limit-fields.tsx
 msgid "Limits"
 msgstr "上限"
@@ -7070,6 +7089,10 @@ msgstr "MAU（サインイン済み）"
 msgid "Max"
 msgstr "最大"
 
+#: apps/remix/app/components/general/rate-limit-array-input.tsx
+msgid "Max requests"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "Maximum file size: 4MB. Maximum 100 rows per upload. Blank values will use template defaults."
 msgstr "最大ファイルサイズ: 4MB。アップロードあたり最大 100 行。空の値はテンプレートのデフォルトが使用されます。"
@@ -7116,12 +7139,12 @@ msgstr "メンバー登録日"
 
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
 #: apps/remix/app/components/tables/admin-organisation-overview-table.tsx
 #: apps/remix/app/components/tables/organisation-groups-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/components/tables/team-groups-table.tsx
-#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
@@ -7190,16 +7213,12 @@ msgid "Monthly Active Users: Users that had at least one of their documents comp
 msgstr "月間アクティブユーザー：1 つ以上の文書が完了したユーザー"
 
 #: apps/remix/app/components/general/claim-limit-fields.tsx
-msgid "Monthly API quota"
-msgstr "月間 API クォータ"
+msgid "Monthly quota"
+msgstr ""
 
-#: apps/remix/app/components/general/claim-limit-fields.tsx
-msgid "Monthly document quota"
-msgstr "月間ドキュメントクォータ"
-
-#: apps/remix/app/components/general/claim-limit-fields.tsx
-msgid "Monthly email quota"
-msgstr "月間メールクォータ"
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
+msgid "Monthly usage"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
@@ -7290,13 +7309,16 @@ msgid "Name"
 msgstr "名前"
 
 #: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "Name is required"
 msgstr "名前は必須です"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Name Settings"
 msgstr "名前の設定"
+
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
+msgid "Near limit"
+msgstr ""
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Need to sign documents?"
@@ -7436,6 +7458,10 @@ msgstr "現在、お客様が行う必要のある操作はありません。"
 #: apps/remix/app/components/general/organisation-groups-multiselect-combobox.tsx
 msgid "No groups found"
 msgstr "グループが見つかりません"
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "No inherited claim"
+msgstr ""
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "No License Configured"
@@ -8153,6 +8179,10 @@ msgstr "保留中の組織招待"
 msgid "Pending since"
 msgstr "保留開始日時"
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "People with access to this organisation."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "per month"
@@ -8314,10 +8344,6 @@ msgstr "トークンの用途が分かる名前を入力してください。後
 #: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
 msgid "Please enter a number"
 msgstr "数値を入力してください"
-
-#: apps/remix/app/components/general/claim-account.tsx
-msgid "Please enter a valid name."
-msgstr "有効な名前を入力してください。"
 
 #: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
 msgid "Please enter a valid number"
@@ -9057,6 +9083,10 @@ msgstr "組織メンバーを削除"
 msgid "Remove Organisation Member"
 msgstr "組織メンバーを削除"
 
+#: apps/remix/app/components/general/rate-limit-array-input.tsx
+msgid "Remove rate limit"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "Remove recipient"
 msgstr "受信者を削除"
@@ -9247,6 +9277,10 @@ msgstr "解決"
 msgid "Resolve payment"
 msgstr "支払いを解決"
 
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
+msgid "Resource blocked"
+msgstr ""
+
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Response"
 msgstr "レスポンス"
@@ -9278,6 +9312,10 @@ msgstr "再試行済み"
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Retry"
 msgstr "再試行"
+
+#: apps/remix/app/components/general/document-signing/document-signing-auto-fill-v2.tsx
+msgid "Retry remaining"
+msgstr ""
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
@@ -9823,6 +9861,10 @@ msgstr "送信中..."
 msgid "Sent"
 msgstr "送信日時"
 
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
+msgid "Sent this period"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Session revoked"
 msgstr "セッションを取り消しました"
@@ -9924,7 +9966,7 @@ msgstr "割り当てを含む利用状況を表示する"
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-password.tsx
-#: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-auto-fill-v2.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-name-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx
@@ -10805,10 +10847,10 @@ msgid "Team URL"
 msgstr "チーム URL"
 
 #: apps/remix/app/components/general/org-menu-switcher.tsx
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
 #: apps/remix/app/components/tables/admin-organisation-overview-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
-#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.teams.tsx
@@ -10818,6 +10860,10 @@ msgstr "チーム"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Teams help you organise your work and collaborate with others. Create your first team to get started."
 msgstr "チームは作業を整理し、他のメンバーとコラボレーションするのに役立ちます。最初のチームを作成して始めましょう。"
+
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Teams that belong to this organisation."
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "Teams that this organisation group is currently assigned to"
@@ -12297,8 +12343,6 @@ msgstr "不明な名前"
 #: apps/remix/app/components/general/claim-limit-fields.tsx
 #: apps/remix/app/components/general/organisation-usage-panel.tsx
 #: apps/remix/app/components/tables/admin-claims-table.tsx
-#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Unlimited"
 msgstr "無制限"
 
@@ -12591,14 +12635,17 @@ msgstr "アップロード中"
 msgid "URL"
 msgstr "URL"
 
-#. placeholder {0}: selectedStat?.period || 'N/A'
-#: apps/remix/app/components/general/organisation-usage-panel.tsx
-msgid "Usage for period: {0}"
-msgstr "期間内の利用状況: {0}"
-
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "Use"
 msgstr "使用"
+
+#: apps/remix/app/components/general/rate-limit-array-input.tsx
+msgid "Use a duration with a unit, e.g. 5m, 1h, or 24h"
+msgstr ""
+
+#: apps/remix/app/components/general/rate-limit-array-input.tsx
+msgid "Use a unique window for each rate limit"
+msgstr ""
 
 #: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx
 #: apps/remix/app/components/forms/signin.tsx
@@ -13476,7 +13523,7 @@ msgstr "有効にすると、SSO で初めてサインインするユーザー�
 msgid "When you click continue, you will be prompted to add the first available authenticator on your system."
 msgstr "続行をクリックすると、システム上で最初に利用可能な認証手段の追加を求められます。"
 
-#: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-auto-fill-v2.tsx
 msgid "When you sign a document, we can automatically fill in and sign the following fields using information that has already been provided. You can also manually sign or remove any automatically signed fields afterwards if you desire."
 msgstr "ドキュメントに署名する際、すでに提供されている情報を使用して、次のフィールドに自動的に入力および署名できます。必要であれば、後から自動署名されたフィールドに手動で署名したり、削除したりすることもできます。"
 
@@ -13501,9 +13548,17 @@ msgstr "ホワイトラベリング、メンバー無制限など"
 msgid "Width:"
 msgstr "幅:"
 
+#: apps/remix/app/components/general/rate-limit-array-input.tsx
+msgid "Window"
+msgstr ""
+
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Withdrawing Consent"
 msgstr "同意の撤回"
+
+#: apps/remix/app/components/general/organisation-usage-panel.tsx
+msgid "Within limit"
+msgstr ""
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "Write a description to display on your public profile"
