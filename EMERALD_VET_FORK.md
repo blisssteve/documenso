@@ -90,6 +90,11 @@ Deployed automatically via GitHub Actions CI/CD on push to `main`.
 - Pushes to Artifact Registry
 - Deploys to Cloud Run with Cloud SQL sidecar and Secret Manager integration
 
+**Documenso email secrets:**
+- `DOCUMENSO_EMAIL_FROM_ADDRESS` must contain a plain mailbox address only (for example, `mailbox@example.com`). `NEXT_PRIVATE_SMTP_FROM_NAME` supplies the display name separately.
+- Do not reuse Bullcheck's shared `EMAIL_FROM` secret here; that secret intentionally uses display-name syntax (`Name <mailbox@example.com>`) and is not valid as Documenso's structured address component.
+- `RESEND_API_KEY` supplies the send-only Resend credential.
+
 **Manual deploy:**
 ```bash
 gh workflow run deploy-cloud-run.yml --repo=blisssteve/documenso
