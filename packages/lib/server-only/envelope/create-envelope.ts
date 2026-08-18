@@ -72,6 +72,7 @@ export type CreateEnvelopeOptions = {
     type: EnvelopeType;
     title: string;
     externalId?: string;
+    idempotencyKey?: string;
     envelopeItems: {
       title?: string;
       documentDataId: string;
@@ -131,6 +132,7 @@ export const createEnvelope = async ({
     type,
     title,
     externalId,
+    idempotencyKey,
     formValues,
     userTimezone,
     folderId,
@@ -363,6 +365,7 @@ export const createEnvelope = async ({
         signatureLevel,
         qrToken: prefixedId('qr'),
         externalId,
+        idempotencyKey,
         envelopeItems: {
           createMany: {
             data: envelopeItems.map((item, i) => ({

@@ -17,7 +17,7 @@ import { zfd } from 'zod-form-data';
 import { zfdFile, zodFormData } from '../../utils/zod-form-data';
 import { ZCreateRecipientSchema } from '../recipient-router/schema';
 import type { TrpcRouteMeta } from '../trpc';
-import { ZDocumentExternalIdSchema, ZDocumentTitleSchema } from './schema';
+import { ZDocumentExternalIdSchema, ZDocumentIdempotencyKeySchema, ZDocumentTitleSchema } from './schema';
 
 export const createDocumentMeta: TrpcRouteMeta = {
   openapi: {
@@ -33,6 +33,7 @@ export const createDocumentMeta: TrpcRouteMeta = {
 export const ZCreateDocumentPayloadSchema = z.object({
   title: ZDocumentTitleSchema,
   externalId: ZDocumentExternalIdSchema.optional(),
+  idempotencyKey: ZDocumentIdempotencyKeySchema.optional(),
   visibility: ZDocumentVisibilitySchema.optional(),
   globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional(),
   globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional(),
