@@ -332,6 +332,15 @@ export class LocalJobProvider extends BaseJobProvider {
           return c.text('Task exceeded retries', 500);
         }
 
+        if (definition.id === 'internal.execute-webhook') {
+          // Keep this request/claim active while waiting (Cloud Run can idle CPU after a response).
+          // ponytail: dispatch remains best-effort; durable recovery needs a persistent queue/lease.
+          const retryDelay = Math.min(5_000 * 2 ** backgroundJob.retried, 20_000);
+          await new Promise((resolve) => {
+            setTimeout(resolve, retryDelay);
+          });
+        }
+
         backgroundJob = await prisma.backgroundJob.update({
           where: {
             id: jobId,
