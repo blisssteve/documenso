@@ -435,6 +435,7 @@ model Envelope {
   id          String  @id
   secondaryId String  @unique
   externalId  String? /// @zod.string.describe("A custom external ID you can use to identify the document.")
+  idempotencyKey String? @db.VarChar(255)
 
   type EnvelopeType
 
@@ -492,6 +493,7 @@ model Envelope {
   @@index([teamId])
   @@index([folderId])
   @@index([createdAt])
+  @@unique([teamId, idempotencyKey])
 }
 
 model EnvelopeItem {
