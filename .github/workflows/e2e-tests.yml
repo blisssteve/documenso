@@ -23,7 +23,7 @@ jobs:
       - uses: ./.github/actions/node-install
 
       - name: Start Services
-        run: npm run dx:up
+        run: npm run dx:up -- database inbucket redis gotenberg
 
       - uses: ./.github/actions/playwright-install
 
