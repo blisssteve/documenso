@@ -25,6 +25,7 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '../../types/field-meta';
+import { embedSignatureImage } from './embed-signature-image';
 import { getPageSize } from './get-page-size';
 
 export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSignature) => {
@@ -129,8 +130,8 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
         type: P.union(FieldType.SIGNATURE, FieldType.FREE_SIGNATURE),
       },
       async (field) => {
-        if (field.signature?.signatureImageAsBase64) {
-          const image = await pdf.embedPng(field.signature?.signatureImageAsBase64 ?? '');
+        if (field.signature?.signatureImageAsBase64 != null) {
+          const image = await embedSignatureImage(pdf, field.signature.signatureImageAsBase64);
 
           let imageWidth = image.width;
           let imageHeight = image.height;
