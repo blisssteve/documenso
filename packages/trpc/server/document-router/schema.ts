@@ -12,4 +12,11 @@ export const ZDocumentTitleSchema = z
 
 export const ZDocumentExternalIdSchema = z.string().trim().max(255).describe('The external ID of the document.');
 
+export const ZDocumentIdempotencyKeySchema = z
+  .string()
+  .trim()
+  .min(1, 'Idempotency key cannot be empty')
+  .max(255, 'Idempotency key must be at most 255 characters')
+  .describe('The idempotency key for creating the document.');
+
 export const ZDocumentVisibilitySchema = z.nativeEnum(DocumentVisibility).describe('The visibility of the document.');
