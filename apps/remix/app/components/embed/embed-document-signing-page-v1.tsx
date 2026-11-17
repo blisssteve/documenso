@@ -1,8 +1,11 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { ZSignDocumentEmbedDataSchema } from '@documenso/lib/types/embed-document-sign-schema';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
+import { getEmbedSignatureForInitialization } from '@documenso/lib/utils/embed-signature';
 import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { dynamicActivate } from '@documenso/lib/utils/i18n';
@@ -32,6 +35,7 @@ import { useEffect, useId, useLayoutEffect, useMemo, useState } from 'react';
 import { BrandingLogo } from '~/components/general/branding-logo';
 import PDFViewerLazy from '~/components/general/pdf-viewer/pdf-viewer-lazy';
 import { injectCss } from '~/utils/css-vars';
+import { getSigningCompletionErrorMessage } from '~/utils/toast-error-messages';
 
 import { DocumentSigningAttachmentsPopover } from '../general/document-signing/document-signing-attachments-popover';
 import { DocumentSigningAutoSign } from '../general/document-signing/document-signing-auto-sign';
@@ -42,6 +46,7 @@ import { EmbedClientLoading } from './embed-client-loading';
 import { EmbedDocumentCompleted } from './embed-document-completed';
 import { EmbedDocumentFields } from './embed-document-fields';
 import { EmbedDocumentRejected } from './embed-document-rejected';
+import { usePersistEmbedSignature } from './use-persist-embed-signature';
 
 export type EmbedSignDocumentV1ClientPageProps = {
   token: string;
@@ -53,9 +58,11 @@ export type EmbedSignDocumentV1ClientPageProps = {
   completedFields: DocumentField[];
   metadata?: DocumentMeta | null;
   isCompleted?: boolean;
+  isRejected?: boolean;
   hidePoweredBy?: boolean;
   allowWhitelabelling?: boolean;
   allRecipients?: RecipientWithFields[];
+  clientUserId?: string | null;
 };
 
 export const EmbedSignDocumentV1ClientPage = ({
@@ -68,18 +75,29 @@ export const EmbedSignDocumentV1ClientPage = ({
   completedFields,
   metadata,
   isCompleted,
+  isRejected,
   hidePoweredBy = false,
   allRecipients = [],
+  clientUserId = null,
 }: EmbedSignDocumentV1ClientPageProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const analytics = useAnalytics();
 
   const { fullName, email, signature, setFullName, setEmail, setSignature } = useRequiredDocumentSigningContext();
+
+  const { persistSignature } = usePersistEmbedSignature({
+    token,
+    clientUserId,
+    initialSignature: signature,
+  });
 
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
   const [hasDocumentLoaded, setHasDocumentLoaded] = useState(false);
   const [hasCompletedDocument, setHasCompletedDocument] = useState(isCompleted);
-  const [hasRejectedDocument, setHasRejectedDocument] = useState(recipient.signingStatus === SigningStatus.REJECTED);
+  const [hasRejectedDocument, setHasRejectedDocument] = useState(
+    isRejected ?? recipient.signingStatus === SigningStatus.REJECTED,
+  );
   const [selectedSignerId, setSelectedSignerId] = useState<number | null>(
     allRecipients.length > 0 ? allRecipients[0].id : null,
   );
@@ -131,10 +149,31 @@ export const EmbedSignDocumentV1ClientPage = ({
         return;
       }
 
-      await completeDocumentWithToken({
+      const result = await completeDocumentWithToken({
         documentId,
         token,
       });
+
+      // TSP envelopes return a CSC authorize URL that only the v2 embed can run.
+      if (result.status === 'REDIRECT') {
+        if (window.parent) {
+          window.parent.postMessage(
+            {
+              action: 'document-error',
+              data: null,
+            },
+            '*',
+          );
+        }
+
+        toast({
+          title: _(msg`Unable to sign document`),
+          description: _(msg`Qualified electronic signatures are not supported in this embed.`),
+          variant: 'destructive',
+        });
+
+        return;
+      }
 
       if (window.parent) {
         window.parent.postMessage(
@@ -151,7 +190,15 @@ export const EmbedSignDocumentV1ClientPage = ({
       }
 
       setHasCompletedDocument(true);
-    } catch {
+    } catch (err) {
+      analytics.captureException(err, {
+        source: 'embed',
+        location: 'complete_document',
+        recipientId: recipient.id,
+        documentId,
+        envelopeId,
+      });
+
       if (window.parent) {
         window.parent.postMessage(
           {
@@ -162,9 +209,12 @@ export const EmbedSignDocumentV1ClientPage = ({
         );
       }
 
+      const error = AppError.parseError(err);
+      const toastMessage = getSigningCompletionErrorMessage(error.code);
+
       toast({
-        title: _(msg`Something went wrong`),
-        description: _(msg`We were unable to submit this document at this time. Please try again later.`),
+        title: _(toastMessage.title),
+        description: _(toastMessage.description),
         variant: 'destructive',
       });
     }
@@ -201,7 +251,15 @@ export const EmbedSignDocumentV1ClientPage = ({
 
       // Keep the validated image ready; applying it to a field still requires a click.
       if (!isCompleted && data.signature) {
-        setSignature(data.signature);
+        const validatedSignature = getEmbedSignatureForInitialization(
+          data.signature,
+          metadata?.uploadSignatureEnabled ?? true,
+          metadata?.drawSignatureEnabled ?? true,
+        );
+
+        if (validatedSignature) {
+          setSignature(validatedSignature);
+        }
       }
 
       // Since a recipient can be provided a name we can lock it without requiring
@@ -233,13 +291,60 @@ export const EmbedSignDocumentV1ClientPage = ({
       } else {
         setHasFinishedInit(true);
       }
-    } catch {
-      console.error('Unable to initialize embedded signing data.');
+    } catch (err) {
+      console.error(err);
+
+      analytics.captureException(err, {
+        source: 'embed',
+        location: 'embed_init',
+        recipientId: recipient.id,
+        documentId,
+        envelopeId,
+      });
+
       setHasFinishedInit(true);
     }
 
     // !: While the two setters are stable we still want to ensure we're avoiding
     // !: re-renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!window.parent) {
+      return;
+    }
+
+    if (hasRejectedDocument) {
+      window.parent.postMessage(
+        {
+          action: 'document-rejected',
+          data: {
+            token,
+            documentId,
+            recipientId: recipient.id,
+          },
+        },
+        '*',
+      );
+
+      return;
+    }
+
+    if (hasCompletedDocument) {
+      window.parent.postMessage(
+        {
+          action: 'document-completed',
+          data: {
+            token,
+            documentId,
+            recipientId: recipient.id,
+          },
+        },
+        '*',
+      );
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -461,7 +566,10 @@ export const EmbedSignDocumentV1ClientPage = ({
                             disableAnimation
                             fullName={fullName}
                             value={signature ?? ''}
-                            onChange={(v) => setSignature(v ?? '')}
+                            onChange={(v) => {
+                              setSignature(v ?? '');
+                              persistSignature(v);
+                            }}
                             typedSignatureEnabled={metadata?.typedSignatureEnabled}
                             uploadSignatureEnabled={metadata?.uploadSignatureEnabled}
                             drawSignatureEnabled={metadata?.drawSignatureEnabled}
@@ -505,7 +613,7 @@ export const EmbedSignDocumentV1ClientPage = ({
           )}
 
           {/* Fields */}
-          <EmbedDocumentFields fields={fields} metadata={metadata} />
+          <EmbedDocumentFields fields={fields} metadata={metadata} onSignatureChanged={persistSignature} />
 
           {/* Completed fields */}
           <DocumentReadOnlyFields documentMeta={metadata || undefined} fields={completedFields} />

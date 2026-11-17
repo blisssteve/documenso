@@ -56,7 +56,20 @@ vi.mock('@documenso/ui/primitives/use-toast', () => ({ useToast: () => ({ toast:
 vi.mock('react-router', () => ({ useRevalidator: () => ({ revalidate: harness.revalidate }) }));
 vi.mock('@lingui/react/macro', () => ({ Trans: 'trans' }));
 vi.mock('@lingui/core/macro', () => ({ msg: (value: string) => value }));
-vi.mock('@lingui/react', () => ({ useLingui: () => ({ _: (value: string) => value }) }));
+vi.mock('@lingui/react', () => ({
+  // ponytail: babel macro compiles <Trans> into message+values props on @lingui/react's Trans.
+  Trans: ({
+    children,
+    message,
+    values,
+  }: {
+    children?: ReactNode;
+    message?: string;
+    values?: Record<string, unknown>;
+  }) =>
+    message ? message.replace(/\{([^}]+)\}/g, (_, key: string) => String(values?.[key] ?? '')) : (children ?? null),
+  useLingui: () => ({ _: (value: string) => value }),
+}));
 
 vi.mock('./document-signing-provider', () => ({
   useRequiredDocumentSigningContext: () => ({ fullName: harness.fullName, email: harness.email }),
@@ -67,7 +80,18 @@ vi.mock('./document-signing-auth-provider', () => ({
 
 import { DocumentSigningAutoSign } from './document-signing-auto-sign';
 
-const elements = (node: ReactNode): ReactElement[] => {
+type ElementProps = {
+  children?: ReactNode;
+  disabled?: boolean;
+  loading?: boolean;
+  onClick?: () => Promise<void> | void;
+};
+
+type ButtonElementProps = ElementProps & {
+  onClick: () => Promise<void>;
+};
+
+const elements = (node: ReactNode): ReactElement<ElementProps>[] => {
   if (Array.isArray(node)) {
     return node.flatMap(elements);
   }
@@ -76,7 +100,7 @@ const elements = (node: ReactNode): ReactElement[] => {
     return [];
   }
 
-  const element = node as ReactElement<{ children?: ReactNode }>;
+  const element = node as ReactElement<ElementProps>;
   return [element, ...elements(element.props.children)];
 };
 
@@ -89,9 +113,17 @@ const text = (node: ReactNode): string => {
     return node.map(text).join('');
   }
 
-  return node && typeof node === 'object' && 'props' in node
-    ? text((node as ReactElement<{ children?: ReactNode }>).props.children)
-    : '';
+  if (node && typeof node === 'object' && 'props' in node) {
+    const element = node as ReactElement<ElementProps>;
+
+    if (typeof element.type === 'function') {
+      return text((element.type as (props: ElementProps) => ReactNode)(element.props));
+    }
+
+    return text(element.props.children);
+  }
+
+  return '';
 };
 
 const field = (id: number, type: FieldType = FieldType.INITIALS, inserted = false) => ({ id, inserted, type });
@@ -102,11 +134,14 @@ const render = () => {
   return DocumentSigningAutoSign({
     recipient: { id: 1, token: 'token-abc' },
     fields: harness.fields as unknown as Field[],
-  }) as ReactElement | null;
+  }) as ReactElement<ElementProps> | null;
 };
 
-const fillButton = (node: ReactNode) =>
-  elements(node).find((element) => element.type === 'button' && /^Fill Name/.test(text(element)));
+const fillButton = (node: ReactNode): ReactElement<ButtonElementProps> | undefined =>
+  elements(node).find(
+    (element): element is ReactElement<ButtonElementProps> =>
+      element.type === 'button' && /^Fill Name/.test(text(element)),
+  );
 
 describe('DocumentSigningAutoSign (V1 standard route)', () => {
   beforeEach(() => {
