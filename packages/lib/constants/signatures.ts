@@ -1,5 +1,22 @@
 export const SIGNATURE_CANVAS_DPI = 2;
 export const SIGNATURE_MIN_COVERAGE_THRESHOLD = 0.01;
 
+const PNG_DATA_URL_PREFIX = 'data:image/png;base64,';
+
+// Base64 of the 8-byte PNG magic number.
+const PNG_BASE64_MAGIC = 'iVBORw0KGgo';
+
+// Legacy embed/V1 consumers may still send JPEG; do not narrow acceptance.
 export const isBase64Image = (value: string) =>
-  value.startsWith('data:image/png;base64,') || value.startsWith('data:image/jpeg;base64,');
+  value.startsWith(PNG_DATA_URL_PREFIX) || value.startsWith('data:image/jpeg;base64,');
+
+// Stricter than `isBase64Image`: also checks the payload is a real PNG.
+export const isPngSignatureDataUrl = (value: string) => {
+  if (!isBase64Image(value)) {
+    return false;
+  }
+
+  const payload = value.slice(PNG_DATA_URL_PREFIX.length);
+
+  return payload.startsWith(PNG_BASE64_MAGIC) && /^[A-Za-z0-9+/]+=*$/.test(payload);
+};

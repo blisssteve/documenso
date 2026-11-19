@@ -16,6 +16,7 @@ export const ZSignDocumentEmbedDataSchema = ZBaseEmbedDataSchema.extend({
     .transform((value) => value || undefined),
   lockName: z.boolean().optional().default(false),
   allowDocumentRejection: z.boolean().optional(),
+  allowDownloadPDF: z.boolean().optional().default(true),
   showOtherRecipientsCompletedFields: z.boolean().optional(),
   // A validated image candidate only. Applying it to a field still requires signer consent.
   signature: z.unknown().optional().transform(parseEmbedSignature),
